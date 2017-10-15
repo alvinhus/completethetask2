@@ -1,0 +1,68 @@
+---
+- hosts: all
+  become: true
+  gather_facts: False
+  vars:
+    - db_user: root
+    - db_password: password
+    - http_port: 80
+
+  tasks:
+  - name: update apt cache
+    apt: update_cache=yes
+  - name: set MySQL root password
+    debconf: name='mysql-server' question='mysql-server/root_password' value='{{db_password | quote}}' vtype='password'
+    become: true
+  - name: repeat mysql root password
+    debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{db_password | quote}}' vtype='password'
+    become: true
+  - name: instalacija paketa 
+    apt: pkg={{item}} state=latest
+    with_items:
+      - git-core 
+      - apache2
+      - mysql-server
+      - php
+      - php-mysql
+      - libapache2-mod-php
+      - python-mysqldb
+
+
+  - name: enable apache rewrite
+    apache2_module: name=rewrite state=present
+
+  - name: Clone mini
+    action: git  repo=https://github.com/panique/mini.git dest=/var/www/html/mini
+    become: true
+  - name: create database mini
+    mysql_db: name=mini state=import target=/var/www/html/mini/_install/01-create-database.sql login_user='{{db_user | quote}}' login_password='{{db_password | quote}}'
+    become: true
+  - name: create table song
+    mysql_db: name=mini state=import target=/var/www/html/mini/_install/02-create-table-song.sql login_user='{{db_user | quote}}' login_password='{{db_password | quote}}'
+    become: true
+  - name: insert demo data into table song
+    mysql_db: name=mini state=import target=/var/www/html/mini/_install/03-insert-demo-data-into-table-song.sql login_user='{{db_user | quote}}' login_password='{{db_password | quote}}'
+    become: true
+# copy mini virtualhost.conf to default apache site location
+  - copy: 
+      src: virtualhost.conf 
+      dest: /etc/apache2/sites-available/000-default.conf
+    become: true
+  - lineinfile:
+      path: /etc/apache2/sites-available/000-default.conf 
+      regexp: '^<VirtualHost \*:' 
+      line: '<VirtualHost *:{{ http_port }}>'
+  - lineinfile:
+      path: /var/www/html/mini/application/config/config.php
+      regexp: 'DB_USER'
+      line: "define('DB_USER','{{db_user | quote}}');"
+  - lineinfile: 
+      path: /var/www/html/mini/application/config/config.php
+      regexp: 'DB_PASS'
+      line: "define('DB_PASS','{{db_password | quote}}');"
+  - file:
+     path: /var/www/html/index.html 
+     state: absent
+  - service:
+     name: apache2
+     state: restarted
