@@ -1,6 +1,6 @@
 # completethetask2
 Test task 2 assignment
-The task is done using Vagrant Version 2.0.0, virtualbox and AWS
+The task is done using Vagrant Version 2.0.0, virtualbox, ansible2.4 and AWS
 Operating system used for virtualbox and aws is ubuntu/xenial64
 
 Prerequisites
@@ -22,4 +22,3 @@ Prerequisites
 4. To start machine on local virtualbox type "vagrant up" and mini is available at 
 	http://localhost:8080
 	
-
