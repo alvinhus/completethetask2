@@ -4,7 +4,7 @@ The task is done using Vagrant Version 2.0.0, virtualbox and AWS
 Operating system used for virtualbox and aws is ubuntu/xenial64
 
 Prerequisites
-- Valid ec2 account with keys
+- Valid aws account with keys
 - Prior to start provisioning through aws it is needed to set up following environmental variables:
 	export AWS_ACCESS_KEY="REPLACE_WITH_VALID_AWS_ACCESS_KEY" 
 	export AWS_SECRET_KEY="REPLACE_WITH_VALID_AWS_SECRET_KEY"
