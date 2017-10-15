@@ -19,4 +19,7 @@ Prerequisites
 2. change active directory to completethetask2 by running "cd completethetask2"
 3. To start machine on aws type
 	vagrant up --provider=aws
+4. To start machine on local virtualbox type "vagrant up" and mini is available at 
+	http://localhost:8080
+	
 
